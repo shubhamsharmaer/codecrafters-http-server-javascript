@@ -34,8 +34,14 @@ const server = net.createServer((socket) => {
       // -> sending a response with status code 200 socket.write("HTTP/1.1 200 \r\n\r\n");
       const content = path.split('/echo/')[1]; // take string after /echo/ -> {str}
       // creating -> response
-      const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${content.length}\r\n\r\n${content}`;
-      socket.write(response);
+      if(headers["Accept-Encoding"] && headers["Accept-Encoding"].includes("gzip")){
+        socket.write(`HTTP/1.1 200 OK\r\n\Content-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n${content}`);
+      }
+      else{
+        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${content.length}\r\n\r\n${content}`);
+      }
+      // const response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${content.length}\r\n\r\n${content}`;
+      // socket.write(response);
     }
     else if(path.startsWith('/files/') && method === "GET"){
       const filename = path.split('/files/')[1];
